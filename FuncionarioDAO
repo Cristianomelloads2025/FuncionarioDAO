@@ -1,0 +1,59 @@
+using System;
+using Npgsql;
+
+class FuncionarioDAO
+{
+    string conexao = "Host=localhost;Username=postgres;Password=123456;Database=meubanco";
+
+    // CREATE - Cadastrar novo funcionário
+    public void CriarFuncionario(string nome, string senha, string email, int idDep)
+    {
+        var conexaoBD = new NpgsqlConnection(conexao);
+        conexaoBD.Open();
+
+        var sql = $"INSERT INTO funcionario (nome, senha, email, id_departamento) " +
+                  $"VALUES ('{nome}', '{senha}', '{email}', {idDep})";
+        var cmd = new NpgsqlCommand(sql, conexaoBD);
+        cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Funcionário cadastrado.");
+        conexaoBD.Close();
+    }
+
+    // READ - Buscar funcionário por ID
+    public void BuscarFuncionario(int id)
+    {
+        var conexaoBD = new NpgsqlConnection(conexao);
+        conexaoBD.Open();
+
+        var sql = $"SELECT nome, email FROM funcionario WHERE id_funcionario = {id}";
+        var cmd = new NpgsqlCommand(sql, conexaoBD);
+        var leitor = cmd.ExecuteReader();
+
+        if (leitor.Read())
+        {
+            Console.WriteLine("Nome: " + leitor["nome"]);
+            Console.WriteLine("Email: " + leitor["email"]);
+        }
+        else
+        {
+            Console.WriteLine("Funcionário não encontrado.");
+        }
+
+        conexaoBD.Close();
+    }
+
+    // UPDATE - Atualizar email do funcionário
+    public void AtualizarEmail(int id, string novoEmail)
+    {
+        var conexaoBD = new NpgsqlConnection(conexao);
+        conexaoBD.Open();
+
+        var sql = $"UPDATE funcionario SET email = '{novoEmail}' WHERE id_funcionario = {id}";
+        var cmd = new NpgsqlCommand(sql, conexaoBD);
+        cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Email atualizado.");
+        conexaoBD.Close();
+    }
+}
